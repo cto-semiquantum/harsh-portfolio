@@ -69,7 +69,7 @@ export default function ScrollHud() {
             <span 
               className={`transition-all duration-300 ${
                 isActive 
-                  ? 'text-[#00FF00] drop-shadow-[0_0_4px_rgba(0,255,0,0.6)] font-bold scale-x-110 origin-right' 
+                  ? 'text-[#06B6D4] drop-shadow-[0_0_4px_rgba(6,182,212,0.7)] font-bold scale-x-110 origin-right' 
                   : 'text-gray-800'
               }`}
             >

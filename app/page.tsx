@@ -5,6 +5,7 @@ import { AnimatePresence } from 'framer-motion';
 import Navbar from '@/src/components/Navbar';
 import Hero from '@/src/components/Hero';
 import About from '@/src/components/About';
+import Philosophy from '@/src/components/Philosophy';
 import Projects from '@/src/components/Projects';
 import Skills from '@/src/components/Skills';
 import Experience from '@/src/components/Experience';
@@ -31,17 +32,13 @@ export default function Home() {
 
   return (
     <>
-      <AnimatePresence mode="wait">
-        {isLoading && (
-          <LoadingScreen key="loader" onComplete={() => setIsLoading(false)} />
-        )}
-      </AnimatePresence>
-
       {mounted && (
         <main className="min-h-screen bg-background selection:bg-primary/30 selection:text-white">
+          <LoadingScreen onComplete={() => setIsLoading(false)} />
           <Navbar />
           <Hero />
           <About />
+          <Philosophy />
           <Projects />
           <Skills />
           <Experience />

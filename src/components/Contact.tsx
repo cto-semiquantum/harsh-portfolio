@@ -1,221 +1,174 @@
 'use client';
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Mail, MapPin, Shield, Send, CheckCircle } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Contact() {
-  const [formState, setFormState] = useState({ name: '', email: '', message: '' });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const formRef    = useRef<HTMLDivElement>(null);
+
+  const [form, setForm]           = useState({ name: '', email: '', message: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted]   = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    setForm(p => ({ ...p, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formState.name || !formState.email || !formState.message) return;
-
-    setIsSubmitting(true);
-    // Simulate API request
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    setFormState({ name: '', email: '', message: '' });
-    
-    // Reset success message after 5 seconds
-    setTimeout(() => setIsSubmitted(false), 5000);
+    if (!form.name || !form.email || !form.message) return;
+    setSubmitting(true);
+    await new Promise(r => setTimeout(r, 1400));
+    setSubmitting(false);
+    setSubmitted(true);
+    setForm({ name: '', email: '', message: '' });
+    setTimeout(() => setSubmitted(false), 5000);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormState((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.fromTo(headingRef.current,
+        { opacity: 0, y: 50 },
+        { opacity: 1, y: 0, duration: 1, ease: 'power3.out',
+          scrollTrigger: { trigger: headingRef.current, start: 'top 95%', toggleActions: 'play none none none' } }
+      );
+      gsap.fromTo(formRef.current,
+        { opacity: 0, y: 40 },
+        { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', delay: 0.2,
+          scrollTrigger: { trigger: formRef.current, start: 'top 95%', toggleActions: 'play none none none' } }
+      );
+    }, sectionRef);
+    return () => ctx.revert();
+  }, []);
+
+  const inputClass = `w-full bg-transparent border-b py-4 text-white placeholder-white/20 
+    focus:outline-none focus:border-white/60 transition-colors text-sm font-light`;
+  const inputStyle = { borderColor: 'rgba(255,255,255,0.1)' };
 
   return (
-    <section id="contact" className="py-24 w-full relative overflow-hidden">
-      {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
+    <section id="contact" ref={sectionRef} className="px-6 lg:px-10 py-24 lg:py-36">
+      {/* Rule */}
+      <div className="h-rule mb-12" />
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="flex items-center gap-4 mb-16">
-          <div className="p-3 bg-primary/10 rounded-lg border border-primary/20">
-            <Mail className="text-primary" size={24} />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-16">
+        <div className="lg:col-span-3">
+          <span className="section-label">Contact</span>
+        </div>
+        <div className="lg:col-span-9">
+          {/* Giant LET'S TALK */}
+          <h2
+            ref={headingRef}
+            className="font-display font-black text-white uppercase tracking-tight opacity-0"
+            style={{ fontSize: 'clamp(3rem, 9vw, 10rem)', lineHeight: 0.88, letterSpacing: '-0.02em' }}
+          >
+            LET&apos;S<br />TALK<span style={{ color: '#E63946' }}>.</span>
+          </h2>
+        </div>
+      </div>
+
+      {/* Form + Info */}
+      <div ref={formRef} className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-6 opacity-0">
+        {/* Left: info */}
+        <div className="lg:col-span-4 space-y-8">
+          <div>
+            <p className="text-[10px] uppercase tracking-widest text-white/30 mb-1">Email</p>
+            <a
+              href="mailto:harsh@semiquantum.live"
+              className="text-sm text-white/60 hover:text-white transition-colors"
+            >
+              harsh@semiquantum.live
+            </a>
           </div>
-          <h2 className="text-3xl font-bold text-white tracking-tight uppercase">Transmit Signal</h2>
-          <div className="flex-1 h-px bg-gradient-to-r from-primary/50 to-transparent ml-4"></div>
+          <div>
+            <p className="text-[10px] uppercase tracking-widest text-white/30 mb-1">Location</p>
+            <p className="text-sm text-white/60">Mumbai, India</p>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-widest text-white/30 mb-3">Socials</p>
+            <div className="flex gap-4">
+              {[
+                { label: 'GitHub', href: 'https://github.com/' },
+                { label: 'LinkedIn', href: 'https://linkedin.com/' },
+              ].map(s => (
+                <a
+                  key={s.label}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mask-link text-sm"
+                  data-text={s.label}
+                >
+                  {s.label}
+                </a>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-widest text-white/30 mb-1">Status</p>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#E63946] animate-pulse" />
+              <span className="text-sm text-white/60">Available for opportunities</span>
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-          
-          {/* Left Column: Technical Node details */}
-          <div className="lg:col-span-5 space-y-8 font-mono">
+        {/* Right: form */}
+        <div className="lg:col-span-8 relative">
+          {submitted && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 rounded-xl"
+                 style={{ background: '#0a0b14' }}>
+              <div className="text-5xl mb-4">✓</div>
+              <p className="font-display font-black text-white text-2xl uppercase">Sent.</p>
+              <p className="text-white/40 text-sm mt-2">I'll get back to you soon.</p>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-0">
             <div>
-              <h3 className="text-xl font-bold text-white mb-2 tracking-tight">NODE INTERFACE</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                Establish a secure connection with Harsh Jha. Responses are typically routed within 24 hours.
-              </p>
+              <input
+                type="text" name="name" value={form.name} onChange={handleChange}
+                placeholder="Your Name" required
+                className={inputClass} style={inputStyle}
+              />
             </div>
-
-            <div className="space-y-6">
-              
-              {/* Connection Status */}
-              <div className="flex items-center gap-4 bg-white/5 border border-white/5 rounded-xl p-4">
-                <span className="relative flex h-3.5 w-3.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neon-green opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-neon-green"></span>
+            <div>
+              <input
+                type="email" name="email" value={form.email} onChange={handleChange}
+                placeholder="Email Address" required
+                className={inputClass} style={inputStyle}
+              />
+            </div>
+            <div>
+              <textarea
+                name="message" value={form.message} onChange={handleChange}
+                placeholder="Your Message" rows={5} required
+                className={`${inputClass} resize-none`} style={inputStyle}
+              />
+            </div>
+            <div className="pt-8">
+              <button
+                type="submit" disabled={submitting}
+                className="group flex items-center gap-3 cursor-pointer disabled:opacity-40"
+              >
+                <span
+                  className="font-display font-black text-white uppercase tracking-tight group-hover:text-[#E63946] transition-colors duration-300"
+                  style={{ fontSize: 'clamp(1.5rem, 3vw, 2.5rem)' }}
+                >
+                  {submitting ? 'Sending...' : 'Send Message'}
                 </span>
-                <div>
-                  <div className="text-xs text-gray-500">CONNECTION STATUS</div>
-                  <div className="text-sm font-bold text-white">SECURE DIRECT NODE ACTIVE</div>
-                </div>
-              </div>
-
-              {/* Contact Info Items */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-4 text-gray-300">
-                  <div className="p-2.5 bg-white/5 border border-white/10 rounded-lg text-primary">
-                    <Mail size={18} />
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-gray-500 uppercase">Secure Mail</div>
-                    <a href="mailto:harsh@semiquantum.live" className="text-sm hover:text-primary transition-colors">
-                      harsh@semiquantum.live
-                    </a>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 text-gray-300">
-                  <div className="p-2.5 bg-white/5 border border-white/10 rounded-lg text-primary">
-                    <MapPin size={18} />
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-gray-500 uppercase">Sector Location</div>
-                    <span className="text-sm">Mumbai, India</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 text-gray-300">
-                  <div className="p-2.5 bg-white/5 border border-white/10 rounded-lg text-primary">
-                    <Shield size={18} />
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-gray-500 uppercase">PGP Key ID</div>
-                    <span className="text-sm text-neon-green">0x9F4C8E21B072AA1D</span>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            {/* Retro Shell Output mockup */}
-            <div className="bg-black/60 border border-white/10 rounded-xl p-5 text-xs text-gray-500 space-y-1 shadow-inner">
-              <div className="text-neon-green">nyx@harsh:~$ ping -c 3 semiquantum.live</div>
-              <div>64 bytes from 104.244.42.1: icmp_seq=1 ttl=56 time=14.2 ms</div>
-              <div>64 bytes from 104.244.42.1: icmp_seq=2 ttl=56 time=13.9 ms</div>
-              <div>64 bytes from 104.244.42.1: icmp_seq=3 ttl=56 time=14.5 ms</div>
-              <div className="text-white">--- semiquantum.live ping statistics ---</div>
-              <div>3 packets transmitted, 3 received, 0% packet loss, time 2003ms</div>
-              <div className="text-neon-green">nyx@harsh:~$ _</div>
-            </div>
-          </div>
-
-          {/* Right Column: Interactive Form */}
-          <div className="lg:col-span-7">
-            <div className="bg-card-bg backdrop-blur-md border border-card-border rounded-2xl p-8 lg:p-10 relative overflow-hidden">
-              {/* Form Success Animation overlay */}
-              {isSubmitted && (
-                <motion.div 
-                  className="absolute inset-0 bg-black/90 backdrop-blur-sm z-20 flex flex-col items-center justify-center p-6 text-center"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
+                <span
+                  className="font-display font-black text-[#E63946] group-hover:translate-x-2 transition-transform duration-300 inline-block"
+                  style={{ fontSize: 'clamp(1.5rem, 3vw, 2.5rem)' }}
                 >
-                  <motion.div
-                    initial={{ scale: 0.5, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-                  >
-                    <CheckCircle size={64} className="text-neon-green mb-4 mx-auto" />
-                  </motion.div>
-                  <h3 className="text-2xl font-bold text-white mb-2">SIGNAL TRANSMITTED</h3>
-                  <p className="text-gray-400 text-sm max-w-sm font-mono">
-                    Message encrypted with AES-256 and sent to node harsh@semiquantum.live. Secure handshake established.
-                  </p>
-                </motion.div>
-              )}
-
-              <form onSubmit={handleSubmit} className="space-y-6">
-                
-                {/* Name Input */}
-                <div className="space-y-2">
-                  <label htmlFor="name" className="text-xs font-mono text-gray-400 uppercase tracking-widest block">
-                    Identity Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formState.name}
-                    onChange={handleChange}
-                    required
-                    placeholder="Enter your name"
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:shadow-[0_0_15px_rgba(112,0,255,0.2)] transition-all font-sans text-sm"
-                  />
-                </div>
-
-                {/* Email Input */}
-                <div className="space-y-2">
-                  <label htmlFor="email" className="text-xs font-mono text-gray-400 uppercase tracking-widest block">
-                    Return Signal Path (Email)
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formState.email}
-                    onChange={handleChange}
-                    required
-                    placeholder="name@domain.com"
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:shadow-[0_0_15px_rgba(112,0,255,0.2)] transition-all font-sans text-sm"
-                  />
-                </div>
-
-                {/* Message Input */}
-                <div className="space-y-2">
-                  <label htmlFor="message" className="text-xs font-mono text-gray-400 uppercase tracking-widest block">
-                    Transmission Payload
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    rows={5}
-                    value={formState.message}
-                    onChange={handleChange}
-                    required
-                    placeholder="Type your message here..."
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:shadow-[0_0_15px_rgba(112,0,255,0.2)] transition-all font-sans text-sm resize-none"
-                  />
-                </div>
-
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-primary hover:bg-primary/95 text-white py-4 rounded-xl font-medium transition-all flex items-center justify-center gap-3 hover:scale-[1.01] active:scale-[0.99] cursor-pointer glow-primary disabled:opacity-50 disabled:cursor-not-allowed uppercase font-mono tracking-widest text-xs"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Encrypting & Sending...
-                    </>
-                  ) : (
-                    <>
-                      Transmit Signal
-                      <Send size={14} className="group-hover:translate-x-1 transition-transform" />
-                    </>
-                  )}
-                </button>
-                
-              </form>
+                  →
+                </span>
+              </button>
             </div>
-          </div>
-
+          </form>
         </div>
       </div>
     </section>

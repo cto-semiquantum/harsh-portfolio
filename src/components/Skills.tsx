@@ -1,136 +1,97 @@
 'use client';
 
-import React from 'react';
-import { Code2, Brain, Layers, ShieldAlert, Wrench, CheckCircle2 } from 'lucide-react';
-import { motion } from 'framer-motion';
-import TiltCard from './ui/TiltCard';
+import { useEffect, useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
+
+const techStack = [
+  'Next.js', 'React', 'TypeScript', 'Python', 'Node.js',
+  'TensorFlow', 'Docker', 'Linux', 'FastAPI', 'Prisma',
+  'ESP32', 'Assembly', 'Groq AI', 'HuggingFace', 'Three.js', 'GSAP',
+];
+
+const categories = [
+  { label: 'Languages',    items: ['Python', 'TypeScript', 'JavaScript', 'SQL', 'Assembly'] },
+  { label: 'Frontend',     items: ['React', 'Next.js', 'Three.js', 'GSAP', 'Tailwind'] },
+  { label: 'Backend / AI', items: ['Node.js', 'FastAPI', 'Groq AI', 'HuggingFace', 'TensorFlow'] },
+  { label: 'Systems',      items: ['Linux', 'Docker', 'AES-256', 'Nmap', 'Burp Suite'] },
+];
 
 export default function Skills() {
-  const categories = [
-    {
-      title: "LANGUAGES",
-      icon: <Code2 className="text-primary mb-2" size={24} />,
-      skills: ["Python", "JavaScript", "HTML", "CSS", "SQL"]
-    },
-    {
-      title: "AI / ML",
-      icon: <Brain className="text-primary mb-2" size={24} />,
-      skills: ["AI Integration", "LLM APIs", "TensorFlow Basics", "HuggingFace", "Groq AI"]
-    },
-    {
-      title: "FULL STACK",
-      icon: <Layers className="text-primary mb-2" size={24} />,
-      skills: ["React", "Next.js", "Tailwind CSS", "Node.js", "Express", "APIs"]
-    },
-    {
-      title: "CYBER / SYSTEMS",
-      icon: <ShieldAlert className="text-primary mb-2" size={24} />,
-      skills: ["Linux Security", "Secure Coding", "Security Fundamentals", "System Programming Basics", "Assembly", "Kernel Dev", "Burp Suite", "Nmap"],
-      colSpan: 2
-    },
-    {
-      title: "IOT & TOOLS",
-      icon: <Wrench className="text-primary mb-2" size={24} />,
-      skills: ["Prisma ORM", "SQLite", "Git", "Docker", "Linux", "ESP32", "Sensors", "Firebase/Blynk Basics", "Automation Tools"]
-    }
-  ];
+  const sectionRef = useRef<HTMLElement>(null);
+  const headerRef  = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.fromTo(headerRef.current,
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out',
+          scrollTrigger: { trigger: headerRef.current, start: 'top 85%', toggleActions: 'play none none none' } }
+      );
+      const cols = sectionRef.current?.querySelectorAll('.skill-col');
+      if (cols) {
+        gsap.fromTo(cols,
+          { opacity: 0, y: 40 },
+          { opacity: 1, y: 0, duration: 0.7, stagger: 0.1, ease: 'power3.out',
+            scrollTrigger: { trigger: sectionRef.current, start: 'top 70%', toggleActions: 'play none none none' } }
+        );
+      }
+    }, sectionRef);
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <section id="skills" className="py-24 relative max-w-7xl mx-auto px-6 overflow-hidden">
-      {/* Background radial glows */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full filter blur-[120px] pointer-events-none" />
+    <section id="skills" ref={sectionRef} className="px-6 lg:px-10 py-24 lg:py-36">
+      {/* Rule */}
+      <div className="h-rule mb-12" />
 
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-16">
-        <h2 className="text-3xl font-black text-white tracking-tight uppercase">Tech Arsenal</h2>
-        <div className="flex-1 h-px bg-gradient-to-r from-primary/50 via-primary/20 to-transparent ml-4"></div>
+      <div ref={headerRef} className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-16 opacity-0">
+        <div className="lg:col-span-3">
+          <span className="section-label">Skills</span>
+        </div>
+        <div className="lg:col-span-9">
+          <h2
+            className="font-display font-black text-white uppercase tracking-tight"
+            style={{ fontSize: 'clamp(2.5rem, 6vw, 6rem)', lineHeight: 0.92 }}
+          >
+            TECH<br />ARSENAL<span style={{ color: '#E63946' }}>.</span>
+          </h2>
+        </div>
       </div>
 
-      {/* Grid of floating cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        {categories.map((cat, index) => {
-          // Alternating floating speeds and offsets to feel organic
-          const floatDuration = 5 + (index % 3) * 0.8;
-          const floatY = [0, -10 - (index % 2) * 4, 0];
+      {/* Marquee strip */}
+      <div className="relative overflow-hidden border-t border-b py-4 mb-16" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+        <div className="absolute left-0 top-0 bottom-0 w-16 z-10 pointer-events-none"
+             style={{ background: 'linear-gradient(to right, #0a0b14, transparent)' }} />
+        <div className="absolute right-0 top-0 bottom-0 w-16 z-10 pointer-events-none"
+             style={{ background: 'linear-gradient(to left, #0a0b14, transparent)' }} />
+        <div className="marquee-track">
+          {[...techStack, ...techStack, ...techStack].map((tech, i) => (
+            <span key={i} className="inline-flex items-center gap-3 mx-8 font-display font-black uppercase text-lg text-white/10 whitespace-nowrap">
+              <span className="w-1.5 h-1.5 rounded-full inline-block flex-shrink-0" style={{ background: '#E63946' }} />
+              {tech}
+            </span>
+          ))}
+        </div>
+      </div>
 
-          return (
-            <motion.div
-              key={index}
-              animate={{ y: floatY }}
-              transition={{
-                duration: floatDuration,
-                repeat: Infinity,
-                ease: 'easeInOut',
-                delay: index * 0.2,
-              }}
-              className={`flex h-full ${cat.colSpan === 2 ? 'lg:col-span-2' : ''}`}
-            >
-              <TiltCard
-                maxTiltX={8}
-                maxTiltY={8}
-                className="w-full flex h-full rounded-2xl overflow-hidden"
-              >
-                <div 
-                  className="bg-black/60 backdrop-blur-md border border-white/10 hover:border-primary/50 rounded-2xl p-6 transition-all duration-500 w-full h-full relative cyber-grid group flex flex-col justify-between overflow-hidden shadow-[0_4px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_0_25px_rgba(112,0,255,0.2)]"
-                  style={{ transformStyle: 'preserve-3d' }}
-                >
-                  {/* Cyber micro corners */}
-                  <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-primary/30 rounded-tl" />
-                  <div className="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-primary/30 rounded-tr" />
-                  <div className="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-primary/30 rounded-bl" />
-                  <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-primary/30 rounded-br" />
-
-                  {/* Scanning Laser Line (moves vertically on hover) */}
-                  <motion.div
-                    className="absolute left-0 right-0 h-[1.5px] bg-cyan-400 opacity-0 group-hover:opacity-40 z-20 pointer-events-none"
-                    animate={{
-                      top: ['0%', '100%', '0%'],
-                    }}
-                    transition={{
-                      duration: 4,
-                      repeat: Infinity,
-                      ease: 'linear',
-                    }}
-                  />
-
-                  {/* Card Header */}
-                  <div 
-                    className="flex items-center gap-3 mb-6 border-b border-white/5 pb-4"
-                    style={{ transform: 'translateZ(15px)', transformStyle: 'preserve-3d' }}
-                  >
-                    {/* Animated Icon */}
-                    <motion.div
-                      whileHover={{ scale: 1.2, rotate: [0, -10, 10, 0] }}
-                      transition={{ duration: 0.4 }}
-                      className="text-primary"
-                    >
-                      {cat.icon}
-                    </motion.div>
-                    <h3 className="text-white font-mono text-sm tracking-wider font-bold">
-                      {cat.title}
-                    </h3>
-                  </div>
-
-                  {/* Skills List */}
-                  <ul 
-                    className={`grid gap-3 flex-1 ${cat.colSpan === 2 ? 'grid-cols-2' : 'grid-cols-1'}`}
-                    style={{ transform: 'translateZ(25px)' }}
-                  >
-                    {cat.skills.map((skill, sIdx) => (
-                      <li 
-                        key={sIdx} 
-                        className="text-gray-300 flex items-center gap-3.5 text-xs font-mono group-hover:text-white transition-colors"
-                      >
-                        <CheckCircle2 size={13} className="text-[#00FF00] shrink-0 drop-shadow-[0_0_4px_rgba(0,255,0,0.5)]" />
-                        <span>{skill}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </TiltCard>
-            </motion.div>
-          );
-        })}
+      {/* Category columns */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        {categories.map((cat, i) => (
+          <div key={i} className="skill-col opacity-0">
+            <h4 className="font-mono text-[10px] uppercase tracking-widest text-[#E63946] mb-5">{cat.label}</h4>
+            <ul className="space-y-2">
+              {cat.items.map((item, j) => (
+                <li key={j} className="flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors">
+                  <span className="w-1 h-1 rounded-full bg-white/20 flex-shrink-0" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
     </section>
   );
